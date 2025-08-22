@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Form Processing</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 900px; margin: 0 auto; padding: 20px; background: #f8f9fa; }
+        .container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-section, .output-section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .form-group { margin: 15px 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: #333; }
+        input, select, textarea { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 4px; font-size: 16px; }
+        input:focus, select:focus, textarea:focus { border-color: #007bff; outline: none; }
+        button { background: #007bff; color: white; padding: 12px 24px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin: 5px; }
+        button:hover { background: #0056b3; }
+        .error { color: #dc3545; font-size: 14px; margin-top: 5px; }
+        .success { color: #28a745; font-size: 14px; margin-top: 5px; }
+        .data-display { background: #e8f5e8; padding: 15px; border-radius: 4px; margin: 10px 0; }
+        .highlight { background: #fff3cd; padding: 10px; border-left: 4px solid #ffc107; margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🎯 Interactive Form Processing Workshop</h1>
+    
+    <div class="container">
+        <div class="form-section">
+            <h2>📝 Module Data Entry</h2>
+            <form id="module-form">
+                <div class="form-group">
+                    <label for="userName">Your Name:</label>
+                    <input type="text" id="userName" name="userName" >
+                    <div id="userName-error" class="error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="moduleType">Assignment 2 Module:</label>
+                    <select id="moduleType" name="moduleType" >
+                        <option value="">Select your module</option>
+                        <option value="discussion">Discussion Forum</option>
+                        <option value="shopping">Shopping Cart</option>
+                        <option value="blog">Blog</option>
+                        <option value="reviews">Product Reviews</option>
+                    </select>
+                    <div id="moduleType-error" class="error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemTitle">Item Title:</label>
+                    <input type="text" id="itemTitle" name="itemTitle" placeholder="e.g., Discussion Topic, Product Name, Blog Post" >
+                    <div id="itemTitle-error" class="error"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="itemContent">Content/Description:</label>
+                    <textarea id="itemContent" name="itemContent" rows="4" placeholder="Describe your item..."></textarea>
+                    <div id="itemContent-error" class="error"></div>
+                    <div id="content-counter">0 characters</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="priority">Priority/Rating:</label>
+                    <select id="priority" name="priority" >
+                        <option value="">Select priority</option>
+                        <option value="1">⭐ (1 - Low)</option>
+                        <option value="2">⭐⭐ (2 - Medium)</option>
+                        <option value="3">⭐⭐⭐ (3 - High)</option>
+                        <option value="4">⭐⭐⭐⭐ (4 - Very High)</option>
+                        <option value="5">⭐⭐⭐⭐⭐ (5 - Critical)</option>
+                    </select>
+                    <div id="priority-error" class="error"></div>
+                </div>
+                
+                <button type="submit">🚀 Submit</button>
+                <button type="button" id="clear-form">🗑️ Clear Form</button>
+                
+            </form>
+        </div>
+        
+        <div class="output-section">
+            <h2>📊 Live Data Processing</h2>
+            <div class="highlight">
+                <strong>💡 Instructions:</strong> Fill out the form and watch real-time validation and data processing in action!
+            </div>
+            
+            <h3>📋 Current Form Data:</h3>
+            <div id="live-data" class="data-display">
+                <em>Start filling the form to see live updates...</em>
+            </div>
+            
+            <h3>✅ Validation Status:</h3>
+            <div id="validation-status" class="data-display">
+                <em>Validation feedback will appear here...</em>
+            </div>
+            
+            <h3>📈 Form Statistics:</h3>
+            <div id="form-stats" class="data-display">
+                <em>Form completion statistics will appear here...</em>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+// 🎯 INTERACTIVE FORM PROCESSING SYSTEM
+
+// Global form data storage
+let formData = {};
+let formStats = {
+    totalFields: 5,
+    completedFields: 0,
+    validationErrors: 0,
+    lastUpdated: null
+};
+
+// Real-time form data tracking
+function trackFormData() {
+    const form = document.getElementById('module-form');
+    
+    formData = {
+        userName: document.getElementById('userName').value,
+        moduleType: document.getElementById('moduleType').value,
+        itemTitle: document.getElementById('itemTitle').value,
+        itemContent: document.getElementById('itemContent').value,
+        priority: document.getElementById('priority').value
+    };
+    
+    // Update live data display
+    updateLiveDataDisplay();
+    updateFormStats();
+    
+    console.log('🔄 Form data updated:', formData);
+}
+
+// Update live data display
+function updateLiveDataDisplay() {
+    const liveDataDiv = document.getElementById('live-data');
+    
+    if (isFormEmpty()) {
+        liveDataDiv.innerHTML = '<em>Start filling the form to see live updates...</em>';
+        return;
+    }
+    
+    let html = '<strong>📋 Live Form Data:</strong><br>';
+    html += `👤 Name: ${formData.userName || '<em>not entered</em>'}<br>`;
+    html += `🎯 Module: ${getModuleDisplayName(formData.moduleType)}<br>`;
+    html += `📝 Title: ${formData.itemTitle || '<em>not entered</em>'}<br>`;
+    html += `📄 Content: ${formData.itemContent ? formData.itemContent.substring(0, 50) + '...' : '<em>not entered</em>'}<br>`;
+    html += `⭐ Priority: ${getPriorityDisplay(formData.priority)}<br>`;
+    html += `⏰ Last updated: ${new Date().toLocaleTimeString()}`;
+    
+    liveDataDiv.innerHTML = html;
+}
+
+// Utility functions
+function isFormEmpty() {
+    return !formData.userName && !formData.moduleType && !formData.itemTitle && 
+           !formData.itemContent && !formData.priority;
+}
+
+function getModuleDisplayName(value) {
+    const modules = {
+        'discussion': 'Discussion Forum',
+        'shopping': 'Shopping Cart',
+        'blog': 'Blog',
+        'reviews': 'Product Reviews'
+    };
+    return modules[value] || '<em>not selected</em>';
+}
+
+function getPriorityDisplay(value) {
+    return value ? '⭐'.repeat(parseInt(value)) + ` (${value})` : '<em>not selected</em>';
+}
+
+// Form statistics tracking
+function updateFormStats() {
+    const fields = [formData.userName, formData.moduleType, formData.itemTitle, 
+                   formData.itemContent, formData.priority];
+    
+    formStats.completedFields = fields.filter(field => field && field.trim() !== '').length;
+    formStats.lastUpdated = new Date().toLocaleString();
+    
+    const completionPercentage = Math.round((formStats.completedFields / formStats.totalFields) * 100);
+    
+    const statsDiv = document.getElementById('form-stats');
+    statsDiv.innerHTML = `
+        📊 Completion: ${formStats.completedFields}/${formStats.totalFields} fields (${completionPercentage}%)<br>
+        ❌ Validation errors: ${formStats.validationErrors}<br>
+        🕐 Last update: ${formStats.lastUpdated}<br>
+        📈 Progress: ${'█'.repeat(Math.floor(completionPercentage/10))}${'░'.repeat(10-Math.floor(completionPercentage/10))} ${completionPercentage}%
+    `;
+}
+
+// Add event listeners for real-time tracking
+document.addEventListener('DOMContentLoaded', function() {
+    const formElements = ['userName', 'moduleType', 'itemTitle', 'itemContent', 'priority'];
+    
+    formElements.forEach(id => {
+        const element = document.getElementById(id);
+        element.addEventListener('input', trackFormData);
+        element.addEventListener('change', trackFormData);
+    });
+    
+    // Initialize displays
+    trackFormData();
+});
+</script>
+</html>

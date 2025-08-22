@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>My Form</title>
+</head>
+<body>
+    <form id="registration-form">
+        <label for="First Name">*First Name</label>
+        <input type="text" name="First Name" placeholder="Enter first name"><br></br>
+        <label for="Email">*Email</label>
+        <input type="text" name="Email" placeholder="Enter email"><br></br>
+        <label for="Phone Number">*Phone Number</label>
+        <input type="text" name="Phone Number" placeholder="Phone Number"><br></br>
+        <label for="numfam">*Number of additional family members</label>
+        <input type="text" name="numfam" placeholder="additional family members"><br></br>
+        <button>Sign Up</button>
+
+    </form>
+
+</body>
+
+<script>
+// Function to validate a required field
+function validateRequired(fieldId, fieldName) {
+    let field = document.getElementById(fieldId);
+    let value = field.value.trim();
+    let feedbackDiv = document.getElementById(fieldId + '-feedback');
+    
+    if (value === '') {
+        feedbackDiv.innerHTML = '<span class="error">' + fieldName + ' is required</span>';
+        return false;
+    } else {
+        feedbackDiv.innerHTML = '<span class="success">✓ Valid</span>';
+        return true;
+    }
+}
+
+// Function to validate email format
+function validateEmail(fieldId) {
+    let field = document.getElementById(fieldId);
+    let email = field.value.trim();
+    let feedbackDiv = document.getElementById(fieldId + '-feedback');
+    
+    // Simple email pattern (basic validation)
+    let emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    
+    if (email === '') {
+        feedbackDiv.innerHTML = '<span class="error">Email is required</span>';
+        return false;
+    } else if (!emailPattern.test(email)) {
+        feedbackDiv.innerHTML = '<span class="error">Please enter a valid email address</span>';
+        return false;
+    } else {
+        feedbackDiv.innerHTML = '<span class="success">✓ Valid email</span>';
+        return true;
+    }
+}
+
+// Test validation functions
+validateRequired('firstName', 'First Name');
+validateEmail('email');
+
+</script>
+</html>
